@@ -17,13 +17,16 @@ jobs:
       - name: Extract and Build
         run: |
           unzip -o *.zip
-          PROJECT_ROOT=$(find . -name "settings.gradle" -o -name "build.gradle" | head -n 1 | xargs dirname)
-          cd "$PROJECT_ROOT"
+          PROJECT_ROOT=$(find . -name "build.gradle*" -o -name "settings.gradle*" | head -n 1)
+          if [ -z "$PROJECT_ROOT" ]; then
+            echo "COULD NOT FIND BUILD FILES. HERE IS WHAT IS INSIDE THE ZIP:"
+            ls -laR
+            exit 1
+          fi
+          cd "$(dirname "$PROJECT_ROOT")"
           gradle assembleDebug
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: VoidPulse-APK
           path: "**/*.apk"
-
-
