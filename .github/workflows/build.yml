@@ -13,11 +13,16 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
-          gradle-version: '8.5'
+          gradle-version: '9.3.1'
       - name: Extract and Build
         run: |
-          unzip *.zip
-          gradle assembleDebug
+          unzip -o *.zip
+          GRADLE_PATH=$(find . -name "gradlew" | head -n 1)
+          cd "$(dirname "$GRADLE_PATH")"
+          mkdir -p gradle/wrapper
+          echo "distributionUrl=https\://services.gradle.org/distributions/gradle-9.3.1-bin.zip" > gradle/wrapper/gradle-wrapper.properties
+          chmod +x gradlew
+          ./gradlew assembleDebug
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
