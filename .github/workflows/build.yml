@@ -15,8 +15,14 @@ jobs:
         with:
           gradle-version: '9.3.1'
       - name: Extract and Build
+        env:
+          JAVA_TOOL_OPTIONS: "-Djava.awt.headless=true"
         run: |
           unzip -o *.zip
+          
+          # Generate the keystore in the exact absolute root path the error requested
+          keytool -genkey -v -keystore $GITHUB_WORKSPACE/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "C=US, O=Android, CN=Android Debug" || true
+          
           PROJECT_ROOT=$(find . -name "build.gradle*" -o -name "settings.gradle*" | head -n 1)
           if [ -z "$PROJECT_ROOT" ]; then
             echo "COULD NOT FIND BUILD FILES."
@@ -25,10 +31,7 @@ jobs:
           fi
           cd "$(dirname "$PROJECT_ROOT")"
           
-          # Fix: Generate the keystore specifically inside the 'app' directory
-          keytool -genkey -v -keystore app/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "C=US, O=Android, CN=Android Debug" || true
-          
-          gradle assembleDebug -Djava.awt.headless=true
+          gradle assembleDebug --no-daemon
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
