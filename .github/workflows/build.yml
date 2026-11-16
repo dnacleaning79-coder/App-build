@@ -17,7 +17,8 @@ jobs:
       - name: Extract and Build
         run: |
           unzip -o *.zip
-          GRADLE_PATH=$(find . -name "gradlew" | head -n 1)
+          GRADLE_PATH=$(find . -name "gradlew" -type f | head -n 1)
+          echo "Found gradlew at: $GRADLE_PATH"
           cd "$(dirname "$GRADLE_PATH")"
           mkdir -p gradle/wrapper
           echo "distributionUrl=https\://services.gradle.org/distributions/gradle-9.3.1-bin.zip" > gradle/wrapper/gradle-wrapper.properties
@@ -28,3 +29,4 @@ jobs:
         with:
           name: VoidPulse-APK
           path: "**/*.apk"
+
