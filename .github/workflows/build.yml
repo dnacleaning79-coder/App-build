@@ -25,10 +25,9 @@ jobs:
           fi
           cd "$(dirname "$PROJECT_ROOT")"
           
-          # Fix 2: Generate the missing digital signature file
-          keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "C=US, O=Android, CN=Android Debug"
+          # Fix: Generate the keystore specifically inside the 'app' directory
+          keytool -genkey -v -keystore app/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "C=US, O=Android, CN=Android Debug" || true
           
-          # Fix 1: Force headless mode to prevent the AWT screen crash
           gradle assembleDebug -Djava.awt.headless=true
       - name: Upload APK
         uses: actions/upload-artifact@v4
